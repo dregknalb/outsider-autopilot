@@ -15,32 +15,50 @@ Nenne keine konkreten Preise oder Rabatte. Setze "werbung" auf true, wenn der Po
 Antworte AUSSCHLIESSLICH mit gültigem JSON ohne Markdown-Codeblock."""
 
 
-def ask(prompt):
+def ask(prompt, max_tokens=8000):
+    """Fragt Claude und liefert geparstes JSON. Wiederholt bei abgeschnittener/ungültiger Antwort."""
     client = anthropic.Anthropic()
-    msg = client.messages.create(
-        model=cfg()["model"], max_tokens=3000, system=SYSTEM,
-        messages=[{"role": "user", "content": prompt}])
-    txt = "".join(b.text for b in msg.content if b.type == "text").strip()
-    txt = txt.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-    return json.loads(txt)
+    last = None
+    for attempt in range(1, 4):
+        msg = client.messages.create(
+            model=cfg()["model"], max_tokens=max_tokens * attempt, system=SYSTEM,
+            messages=[{"role": "user", "content": prompt}])
+        txt = "".join(b.text for b in msg.content if b.type == "text").strip()
+        txt = txt.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        starts = [i for i in (txt.find("{"), txt.find("[")) if i >= 0]
+        if starts:
+            txt = txt[min(starts):max(txt.rfind("}"), txt.rfind("]")) + 1]
+        try:
+            return json.loads(txt)
+        except json.JSONDecodeError as e:
+            last = f"{e} (stop_reason={msg.stop_reason})"
+            print(f"Versuch {attempt}: ungültiges JSON, wiederhole … {last}")
+    raise RuntimeError(f"Claude lieferte kein gültiges JSON: {last}")
 
 
 def drafts():
     rows, profile = load_calendar(), brand_profile()
+    failed = []
     for r in rows:
         if r["status"] != "idea":
             continue
         fmt = r["format"]
         prompt = f"""BRAND-PROFIL:\n{profile}\n\nERSTELLE EINEN POST.
 Säule: {r['pillar']} | Format: {fmt} | Thema: {r['topic']}
-Schema: {{"hook": str, "slides": [{{"title": str, "body": str}}] (6-9 Slides bei carousel, 1 bei image, [] bei reel, Slide 1 = Hook, letzte = CTA),
+Schema: {{"hook": str, "slides": [{{"title": str, "body": str}}] (6-9 Slides bei carousel, 1 bei image, [] bei reel, Slide 1 = Hook, letzte = CTA, body max. 25 Wörter),
 "caption": str (Zeile 1 = Hook, kurze Absätze, ein CTA), "hashtags": [str],
 "alt_text": str, "werbung": bool, "photo_hint": str (kurze Beschreibung des idealen Fotos pro Slide-Hintergrund), "reel_script": str oder null (bei reel: Szenen mit Sekundenangaben und Text-Overlays)}}"""
-        data = ask(prompt)
-        save_content(r["id"], data)
-        r["status"] = "draft"
-        print(f"Entwurf erstellt: {r['id']}")
-    save_calendar(rows)
+        try:
+            data = ask(prompt)
+            save_content(r["id"], data)
+            r["status"] = "draft"
+            save_calendar(rows)          # sofort sichern, damit bei späteren Fehlern nichts verloren geht
+            print(f"Entwurf erstellt: {r['id']}")
+        except Exception as e:
+            failed.append(r["id"])
+            print(f"::warning::Entwurf {r['id']} fehlgeschlagen: {e}")
+    if failed:
+        print(f"Nicht erstellt (beim nächsten Lauf erneut versucht): {', '.join(failed)}")
 
 
 def ideas():
@@ -53,7 +71,7 @@ def ideas():
 {[r['topic'] for r in rows][-40:]}\n\nLiefere {n} neue, nicht doppelte Post-Ideen, Säulen gemäß Profil gemischt,
 Formate nur carousel oder image. Wiederhole Muster der erfolgreichsten Posts.
 Schema: [{{"pillar": str, "format": "carousel"|"image", "topic": str}}]"""
-    new = ask(prompt)
+    new = ask(prompt, max_tokens=3000)
     start = max([int(r["id"][1:]) for r in rows if r["id"][1:].isdigit()] + [0])
     last = max([parse_dt(r["publish_at"]) for r in rows if r["publish_at"]] + [now()])
     from datetime import timedelta
