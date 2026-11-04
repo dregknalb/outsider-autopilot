@@ -5,7 +5,7 @@ calendar: content_calendar.csv
 brand_profile: brand_profile.md
 # Öffentliche Basis-URL, unter der der Ordner media/ erreichbar ist.
 # GitHub (öffentliches Repo): https://raw.githubusercontent.com/<user>/<repo>/main
-media_base_url: "https://raw.githubusercontent.com/DEIN-USER/DEIN-REPO/main"
+media_base_url: "https://raw.githubusercontent.com/dregknalb/outsider-autopilot/main"
 design:
   width: 1080
   height: 1350
