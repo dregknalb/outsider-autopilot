@@ -1,0 +1,49 @@
+{
+  "hook": "Stirnlampe oder Taschenlampe? Frag den Einsatz.",
+  "slides": [
+    {
+      "title": "Stirnlampe oder Taschenlampe? Frag den Einsatz.",
+      "body": "Lumen, Leuchtdauer, Kälte: So ordnest du die Zahlen ein, ohne dich vom Datenblatt blenden zu lassen."
+    },
+    {
+      "title": "Hände frei oder Reichweite",
+      "body": "Stirnlampe: Licht dort, wo du hinschaust, beide Hände frei. Taschenlampe: gebündelter Strahl für Distanz. Die erste Frage ist also, was du tust."
+    },
+    {
+      "title": "Lumen sind nicht Reichweite",
+      "body": "Lumen beschreiben die Lichtmenge, nicht die Strahlweite. Ein breiter Strahl mit vielen Lumen leuchtet nah hell, aber nicht weit. Reichweite steht oft separat im Datenblatt."
+    },
+    {
+      "title": "Leuchtdauer ist ein Kurvenwert",
+      "body": "Die Angabe gilt meist für eine bestimmte Stufe, unter Laborbedingungen. Achte auf eine Messung nach ANSI FL1 und darauf, bei welcher Stufe sie gilt."
+    },
+    {
+      "title": "Kälte frisst Akku",
+      "body": "Bei Frost lässt die Leistung vieler Akkus nach. Die Laufzeit auf dem Papier ist dann Optimismus. Plane Reserve ein."
+    },
+    {
+      "title": "Warm halten, Reserve mitnehmen",
+      "body": "Ersatzzellen in die Innentasche, Lampe vor dem Einsatz nicht auskühlen lassen. Lithium-Primärzellen gelten als robuste Reserve bei Kälte."
+    },
+    {
+      "title": "Mein Ansatz",
+      "body": "Stirnlampe als Standard für Camp, Aufstieg und Handgriffe. Dazu eine kleine Taschenlampe, wenn du Distanz oder Orientierung brauchst. Mehr braucht es selten."
+    },
+    {
+      "title": "Speichern für deine nächste Packliste",
+      "body": "Schick das an deinen Reisepartner. Finest Products for mobile People."
+    }
+  ],
+  "caption": "Stirnlampe oder Taschenlampe? Frag den Einsatz.\n\nDie Stirnlampe gibt dir freie Hände. Die Taschenlampe gibt dir Strahl und Distanz.\n\nLumen sagen dir, wie viel Licht entsteht. Nicht, wie weit es trägt. Bei der Leuchtdauer lohnt der Blick auf die Stufe, für die der Wert gilt.\n\nBei Kälte rechnest du mit weniger. Akku nah am Körper tragen, Reserve einpacken.\n\nSpeichern für deine nächste Packliste.",
+  "hashtags": [
+    "#outdoorgear",
+    "#stirnlampe",
+    "#packliste",
+    "#campingausrüstung",
+    "#outsidermagazin"
+  ],
+  "alt_text": "Schwarzes Karussell mit feinen topografischen Höhenlinien und Serifen-Titeln in Off-White. Es erklärt den Unterschied zwischen Stirnlampe und Taschenlampe sowie Lumen, Leuchtdauer und Kälteverhalten.",
+  "werbung": false,
+  "photo_hint": "Slide 1: schwarze Fläche mit feinen Höhenlinien, Stirnlampe und kleine Taschenlampe als Freisteller nebeneinander, viel Dunkelraum. Slide 2: Silhouette einer Person mit Stirnlampe im Nebel, Lichtkegel nah. Slide 3: Taschenlampenstrahl über verschneite Fläche, weit in die Dunkelheit. Slide 4: Nahaufnahme von Lampe auf dunklem Stein, Bedienknopf im Fokus. Slide 5: Raureif auf Metall und Stein, entsättigt, kalte Töne. Slide 6: Hand schiebt Ersatzzellen in die Innentasche einer Jacke. Slide 7: Flat Lay mit Stirnlampe und kleiner Taschenlampe auf dunklem Untergrund. Slide 8: schwarze Fläche mit Höhenlinien, weißes Wordmark-Logo, Tagline.",
+  "reel_script": null
+}

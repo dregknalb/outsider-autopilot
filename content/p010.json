@@ -1,0 +1,49 @@
+{
+  "hook": "Powerbank: Worauf es wirklich ankommt",
+  "slides": [
+    {
+      "title": "Powerbank: Worauf es wirklich ankommt",
+      "body": "Kapazität, Flugzeug, Kälte. Drei Punkte, die unterwegs entscheiden."
+    },
+    {
+      "title": "Wh statt mAh",
+      "body": "mAh klingt groß, sagt aber wenig. Wh ist die vergleichbare Zahl. Und die, nach der Airlines fragen."
+    },
+    {
+      "title": "Die Rechnung",
+      "body": "mAh × 3,7 V ÷ 1000 = Wh. 20.000 mAh sind rund 74 Wh. Nutzbar ist weniger, wegen Wandlungsverlusten."
+    },
+    {
+      "title": "Im Flugzeug",
+      "body": "Bis 100 Wh meist ohne Genehmigung. Zwischen 100 und 160 Wh nur mit Zustimmung der Airline. Darüber nicht erlaubt."
+    },
+    {
+      "title": "Nur ins Handgepäck",
+      "body": "Powerbanks reisen in der Kabine, nie im aufgegebenen Koffer. Regeln unterscheiden sich je Airline. Vorher kurz prüfen."
+    },
+    {
+      "title": "Kälte",
+      "body": "Kälte senkt die nutzbare Kapazität, vorübergehend. Trag die Powerbank nah am Körper. Einen gefrorenen Akku lädst du nicht."
+    },
+    {
+      "title": "Verarbeitung",
+      "body": "Solides Gehäuse, saubere Anschlüsse, USB-C mit klar angegebener Leistung. Das Kabel gehört dazu und darf nicht der schwächste Teil sein."
+    },
+    {
+      "title": "Speichern für deine nächste Packliste",
+      "body": "Oder schick das an deinen Reisepartner. Finest Products for mobile People."
+    }
+  ],
+  "caption": "Powerbank: Worauf es wirklich ankommt.\n\nmAh ist Marketing. Wh ist die Zahl, die zählt. Vor allem am Flughafen.\n\nBis 100 Wh meist problemlos im Handgepäck. Bis 160 Wh nur mit Zustimmung der Airline. Darüber bleibt sie zu Hause. Die genauen Regeln hängen von der Airline ab, prüf sie vor dem Abflug.\n\nIm Winter gilt: warm halten, am Körper tragen, nichts Gefrorenes laden.\n\nSpeichern für deine nächste Packliste.",
+  "hashtags": [
+    "#powerbank",
+    "#outdoorgear",
+    "#reisegadgets",
+    "#packliste",
+    "#mikroabenteuer"
+  ],
+  "alt_text": "Schwarzer Hintergrund mit feinen topografischen Höhenlinien. Darauf in weißer Serifenschrift der Titel: Powerbank: Worauf es wirklich ankommt.",
+  "werbung": false,
+  "photo_hint": "Durchgehend schwarze Fläche mit feinen topografischen Höhenlinien über alle Slides. Slide 1: Titel in Off-White, viel Dunkelraum. Slide 2-3: Wh-Formel groß und typografisch, kein Foto. Slide 4-5: schlichte Piktogramm-Skala oder Linie mit 100/160 Wh, Grau als Akzent. Slide 6: entsättigter Freisteller einer Powerbank vor Nebel oder Schnee. Slide 7: Makroaufnahme einer Powerbank mit USB-C-Anschluss und Kabel auf dunklem Stein. Slide 8: weißes Bildzeichen, Tagline, ruhige Fläche.",
+  "reel_script": null
+}
