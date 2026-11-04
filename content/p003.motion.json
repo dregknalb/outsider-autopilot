@@ -1,0 +1,11 @@
+{
+  "hook": ["Overnighter.", "20 Sekunden."],
+  "scenes": [
+    {"no": "01", "title": "Shelter",        "sub": "Zelt oder Tarp",            "icon": "tent"},
+    {"no": "02", "title": "Schlafen",       "sub": "Matte und Schlafsack",       "icon": "bag"},
+    {"no": "03", "title": "Kochen",         "sub": "Kocher, Tasse, fertig",      "icon": "stove"},
+    {"no": "04", "title": "Licht & Strom",  "sub": "Stirnlampe und Powerbank",   "icon": "lamp"},
+    {"no": "05", "title": "Mein Extra",     "sub": "Das eine Ding, das bleibt",  "icon": "camera"}
+  ],
+  "outro": ["Was fehlt?", "Schreib es unten rein."]
+}
