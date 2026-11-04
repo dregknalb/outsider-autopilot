@@ -1,0 +1,41 @@
+name: instagram-autopilot
+on:
+  schedule:
+    - cron: "0 5 * * 1"      # Montag: neue Ideen + Entwürfe (UTC)
+    - cron: "5 * * * *"      # stündlich: Fälliges veröffentlichen
+    - cron: "0 6 * * 0"      # Sonntag: Insights
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: instagram
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt && sudo apt-get install -y fonts-dejavu-core
+      - name: Wöchentlich Ideen und Entwürfe
+        if: github.event.schedule == '0 5 * * 1' || github.event_name == 'workflow_dispatch'
+        run: |
+          python src/generate.py ideas
+          python src/generate.py drafts
+          python src/render.py
+      - name: Entwürfe committen
+        run: |
+          git config user.name "autopilot"; git config user.email "autopilot@users.noreply.github.com"
+          git add -A && (git commit -m "Autopilot: Entwürfe/Status" && git pull --rebase && git push) || true
+      - name: Veröffentlichen (nur status=approved)
+        if: github.event.schedule != '0 6 * * 0' && github.event.schedule != '0 5 * * 1'
+        run: python src/publish.py
+      - name: Insights
+        if: github.event.schedule == '0 6 * * 0'
+        run: python src/insights.py
+      - name: Ergebnisse committen
+        run: |
+          git add -A && (git commit -m "Autopilot: Status/Insights" && git pull --rebase && git push) || true
