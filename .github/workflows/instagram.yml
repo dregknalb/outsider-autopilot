@@ -22,6 +22,7 @@ jobs:
       - run: pip install -r requirements.txt && sudo apt-get install -y fonts-dejavu-core
       - name: Wöchentlich Ideen und Entwürfe
         if: github.event.schedule == '0 5 * * 1' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
         run: |
           python src/generate.py ideas
           python src/generate.py drafts
