@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  issues: write
 concurrency: instagram
 jobs:
   run:
@@ -31,6 +32,11 @@ jobs:
         run: |
           git config user.name "autopilot"; git config user.email "autopilot@users.noreply.github.com"
           git add -A && (git commit -m "Autopilot: Entwürfe/Status" && git pull --rebase && git push) || true
+      - name: Freigabe-Tickets erstellen
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python src/notify.py
       - name: Veröffentlichen (nur status=approved)
         if: github.event.schedule != '0 6 * * 0' && github.event.schedule != '0 5 * * 1'
         run: python src/publish.py
