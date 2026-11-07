@@ -9,7 +9,10 @@ media_base_url: "https://raw.githubusercontent.com/dregknalb/outsider-autopilot/
 design:
   width: 1080
   height: 1350
-  background: "#0B0B0C"
+  background: "#1D1E21"
+  title_size: 100
+  cover_title_size: 132
+  body_size: 46
   text: "#F2F2F0"
   accent: "#8A8A86"
   handle: "@outsidermagazin.de"
