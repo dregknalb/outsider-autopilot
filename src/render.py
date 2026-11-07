@@ -1,6 +1,6 @@
 """Rendert Slides (PNG 1080x1350) und Reel-Cover (1080x1920).
 Hintergrund: Foto (photos/<id>/NN.jpg) > Höhenlinien (background_art: topo) > einfarbig."""
-import os
+import hashlib, json, os
 import shutil
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -79,7 +79,7 @@ def background(d, pid, idx, strip, H, W):
 
 def header(img, dr, d, W, M, counter=None, top=None):
     y0 = M if top is None else top
-    f_small = font(d["font_body"], 24)
+    f_small = font(d["font_body"], 26)
     wp = path(d["wordmark"]) if d.get("wordmark") else None
     if wp and os.path.exists(wp):
         lg = Image.open(wp).convert("RGBA"); lh = 38
@@ -97,9 +97,9 @@ def render_slide(pid, slide, idx, total, out, strip=None):
     W, H, M = d["width"], d["height"], 96
     img, has_photo = background(d, pid, idx, strip, H, W)
     dr = ImageDraw.Draw(img)
-    f_title = font(d["font_title"], 112 if idx == 1 else 84)
-    f_body = font(d["font_body"], 38)
-    f_small = font(d["font_body"], 24)
+    f_title = font(d["font_title"], d.get("cover_title_size", 132) if idx == 1 else d.get("title_size", 100))
+    f_body = font(d["font_body"], d.get("body_size", 46))
+    f_small = font(d["font_body"], 26)
     header(img, dr, d, W, M, f"{idx:02d} / {total:02d}")
     t_lines = wrap(dr, slide["title"], f_title, W - 2 * M)
     b_lines = wrap(dr, slide.get("body", ""), f_body, W - 2 * M - 120)
@@ -144,18 +144,25 @@ def render_cover(pid, title, out):
 
 def run():
     d = cfg()["design"]
+    dh = hashlib.md5(json.dumps(d, sort_keys=True).encode()).hexdigest()[:10]
     failed = []
     for r in load_calendar():
         if r["status"] not in ("draft", "approved"):
             continue
         out = path("media", r["id"])
-        if os.path.isdir(out) and os.listdir(out):
-            continue
+        marker = os.path.join(out, ".design")
+        if os.path.isdir(out) and any(f.endswith(".png") for f in os.listdir(out)):
+            if os.path.exists(marker) and open(marker).read() == dh:
+                continue                              # bereits im aktuellen Design gerendert
+            for f in os.listdir(out):                 # Design geändert: nur PNGs neu erzeugen (Videos bleiben)
+                if f.endswith(".png"):
+                    os.remove(os.path.join(out, f))
         try:
             content = load_content(r["id"])
             os.makedirs(out, exist_ok=True)
             if r["format"] == "reel":
                 render_cover(r["id"], content.get("cover_title", r["topic"]), os.path.join(out, "cover.png"))
+                open(marker, "w").write(dh)
                 print(f"Cover gerendert: {r['id']}"); continue
             slides = content["slides"]
             if not slides:
@@ -165,6 +172,7 @@ def run():
                 strip = topo_strip(int(r["id"][1:] or 1) * 7919, d["width"] * len(slides), d["height"])
             for i, s in enumerate(slides, 1):
                 render_slide(r["id"], s, i, len(slides), os.path.join(out, f"{i:02d}.png"), strip)
+            open(marker, "w").write(dh)
             print(f"Gerendert: {r['id']} ({len(slides)} Slides)")
         except Exception as e:                       # ein kaputter Entwurf blockiert nicht die anderen
             shutil.rmtree(out, ignore_errors=True)   # unvollständige Ausgabe entfernen, nächster Lauf versucht es erneut
