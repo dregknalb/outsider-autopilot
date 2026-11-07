@@ -1,6 +1,7 @@
 """Rendert Slides (PNG 1080x1350) und Reel-Cover (1080x1920).
 Hintergrund: Foto (photos/<id>/NN.jpg) > Höhenlinien (background_art: topo) > einfarbig."""
 import os
+import shutil
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from common import *
@@ -143,24 +144,34 @@ def render_cover(pid, title, out):
 
 def run():
     d = cfg()["design"]
+    failed = []
     for r in load_calendar():
         if r["status"] not in ("draft", "approved"):
             continue
         out = path("media", r["id"])
         if os.path.isdir(out) and os.listdir(out):
             continue
-        os.makedirs(out, exist_ok=True)
-        content = load_content(r["id"])
-        if r["format"] == "reel":
-            render_cover(r["id"], content.get("cover_title", r["topic"]), os.path.join(out, "cover.png"))
-            print(f"Cover gerendert: {r['id']}"); continue
-        slides = content["slides"]
-        strip = None
-        if d.get("background_art") == "topo":
-            strip = topo_strip(int(r["id"][1:] or 1) * 7919, d["width"] * len(slides), d["height"])
-        for i, s in enumerate(slides, 1):
-            render_slide(r["id"], s, i, len(slides), os.path.join(out, f"{i:02d}.png"), strip)
-        print(f"Gerendert: {r['id']} ({len(slides)} Slides)")
+        try:
+            content = load_content(r["id"])
+            os.makedirs(out, exist_ok=True)
+            if r["format"] == "reel":
+                render_cover(r["id"], content.get("cover_title", r["topic"]), os.path.join(out, "cover.png"))
+                print(f"Cover gerendert: {r['id']}"); continue
+            slides = content["slides"]
+            if not slides:
+                raise ValueError("Entwurf enthält keine Slides")
+            strip = None
+            if d.get("background_art") == "topo":
+                strip = topo_strip(int(r["id"][1:] or 1) * 7919, d["width"] * len(slides), d["height"])
+            for i, s in enumerate(slides, 1):
+                render_slide(r["id"], s, i, len(slides), os.path.join(out, f"{i:02d}.png"), strip)
+            print(f"Gerendert: {r['id']} ({len(slides)} Slides)")
+        except Exception as e:                       # ein kaputter Entwurf blockiert nicht die anderen
+            shutil.rmtree(out, ignore_errors=True)   # unvollständige Ausgabe entfernen, nächster Lauf versucht es erneut
+            failed.append(r["id"])
+            print(f"::warning::Rendern von {r['id']} fehlgeschlagen: {type(e).__name__}: {e}")
+    if failed:
+        print(f"Nicht gerendert: {', '.join(failed)}")
 
 
 if __name__ == "__main__":

@@ -48,6 +48,10 @@ def main():
             content = load_content(r["id"])
         except FileNotFoundError:
             continue
+        folder = path("media", r["id"])
+        if not (os.path.isdir(folder) and any(f.endswith(".png") for f in os.listdir(folder))):
+            print(f"Noch keine Bilder für {r['id']}, Ticket folgt beim nächsten Lauf")
+            continue
         title = f"Freigabe {r['id']} – {r['topic'][:70]}"
         num = gh("POST", f"/repos/{repo}/issues", json={"title": title, "body": body_for(r, content, base),
                                                          "labels": ["freigabe"]}).json()["number"]

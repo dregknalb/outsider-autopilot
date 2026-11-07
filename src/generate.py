@@ -50,6 +50,12 @@ Schema: {{"hook": str, "slides": [{{"title": str, "body": str}}] (6-9 Slides bei
 "alt_text": str, "werbung": bool, "photo_hint": str (kurze Beschreibung des idealen Fotos pro Slide-Hintergrund), "reel_script": str oder null (bei reel: Szenen mit Sekundenangaben und Text-Overlays)}}"""
         try:
             data = ask(prompt)
+            if fmt != "reel":                      # Schema prüfen, damit das Rendern nicht an Claude-Abweichungen scheitert
+                sl = data.get("slides")
+                if not isinstance(sl, list) or not sl or not all(isinstance(x, dict) and x.get("title") for x in sl):
+                    raise ValueError("Slides fehlen oder haben kein 'title'")
+            if not data.get("caption"):
+                raise ValueError("Caption fehlt")
             save_content(r["id"], data)
             r["status"] = "draft"
             save_calendar(rows)          # sofort sichern, damit bei späteren Fehlern nichts verloren geht
