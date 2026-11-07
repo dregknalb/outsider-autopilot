@@ -23,4 +23,8 @@ design:
   background_art: topo     # Höhenlinien, wenn kein Foto vorhanden (leer = einfarbig)
   photo_overlay: 0.55      # Abdunklung von Fotos (0-1) für Lesbarkeit
 ideas_per_run: 8
+buffer_posts: 12
+draft_days_ahead: 14
+render_days_ahead: 14
+notify_days_ahead: 7
 max_posts_per_day: 2
