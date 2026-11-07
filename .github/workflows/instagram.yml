@@ -28,6 +28,9 @@ jobs:
           python src/generate.py ideas
           python src/generate.py drafts
           python src/render.py
+      - name: Fehlende Slides rendern
+        continue-on-error: true
+        run: python src/render.py
       - name: Entwürfe committen
         run: |
           git config user.name "autopilot"; git config user.email "autopilot@users.noreply.github.com"
