@@ -2,6 +2,7 @@
 Hintergrund: Foto (photos/<id>/NN.jpg) > Höhenlinien (background_art: topo) > einfarbig."""
 import hashlib, json, os
 import shutil
+from datetime import timedelta
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from common import *
@@ -146,8 +147,9 @@ def run():
     d = cfg()["design"]
     dh = hashlib.md5(json.dumps(d, sort_keys=True).encode()).hexdigest()[:10]
     failed = []
+    horizon = now() + timedelta(days=cfg().get("render_days_ahead", 14))
     for r in load_calendar():
-        if r["status"] not in ("draft", "approved"):
+        if r["status"] not in ("draft", "approved") or parse_dt(r["publish_at"]) > horizon:
             continue
         out = path("media", r["id"])
         marker = os.path.join(out, ".design")

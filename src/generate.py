@@ -3,6 +3,7 @@
   python src/generate.py ideas
 """
 import csv, json, os, sys
+from datetime import timedelta
 import anthropic
 from common import *
 
@@ -39,9 +40,10 @@ def ask(prompt, max_tokens=8000):
 def drafts():
     rows, profile = load_calendar(), brand_profile()
     failed = []
+    horizon = now() + timedelta(days=cfg().get("draft_days_ahead", 14))
     for r in rows:
-        if r["status"] != "idea":
-            continue
+        if r["status"] != "idea" or parse_dt(r["publish_at"]) > horizon:
+            continue                                  # nur Beiträge der nächsten Tage ausarbeiten
         fmt = r["format"]
         prompt = f"""BRAND-PROFIL:\n{profile}\n\nERSTELLE EINEN POST.
 Säule: {r['pillar']} | Format: {fmt} | Thema: {r['topic']}
@@ -69,6 +71,11 @@ Schema: {{"hook": str, "slides": [{{"title": str, "body": str}}] (6-9 Slides bei
 
 def ideas():
     rows, profile = load_calendar(), brand_profile()
+    offen = [r for r in rows if r["status"] in ("idea", "draft", "approved", "hold")]
+    puffer = cfg().get("buffer_posts", 12)
+    if len(offen) >= puffer:                          # genug Vorrat: keine neuen Ideen
+        print(f"{len(offen)} offene Beiträge (Puffer {puffer}), keine neuen Ideen nötig")
+        return
     perf = ""
     if os.path.exists(path("performance.csv")):
         perf = open(path("performance.csv"), encoding="utf-8").read()[-4000:]
@@ -80,7 +87,6 @@ Schema: [{{"pillar": str, "format": "carousel"|"image", "topic": str}}]"""
     new = ask(prompt, max_tokens=3000)
     start = max([int(r["id"][1:]) for r in rows if r["id"][1:].isdigit()] + [0])
     last = max([parse_dt(r["publish_at"]) for r in rows if r["publish_at"]] + [now()])
-    from datetime import timedelta
     for i, it in enumerate(new, 1):
         last = (last + timedelta(days=2)).replace(hour=18, minute=0)
         rows.append({"id": f"p{start + i:03d}", "publish_at": last.strftime("%Y-%m-%d %H:%M"),
