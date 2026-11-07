@@ -2,3 +2,4 @@ anthropic>=0.40.0
 requests>=2.31
 Pillow>=10.0
 PyYAML>=6.0
+numpy>=1.26
