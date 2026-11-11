@@ -11,6 +11,22 @@ W, H, FPS = 1080, 1920, 30
 SC_START, SC_LEN, HOOK_LEN = 2.5, 3.0, 2.5
 
 
+from functools import lru_cache
+_probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+
+
+@lru_cache(maxsize=None)
+def _font(rel, size):
+    return font(rel, size)
+
+
+@lru_cache(maxsize=None)
+def fit_font(rel, size, txt, maxw=888):
+    while size > 40 and _probe.textlength(txt, font=_font(rel, size)) > maxw:
+        size -= 6
+    return _font(rel, size)
+
+
 def ease(x):
     x = min(max(x, 0), 1); return 1 - (1 - x) ** 3
 
@@ -40,6 +56,29 @@ def icon(name, col):
         d.ellipse((350,350,850,850), outline=c, width=lw); d.ellipse((480,480,720,720), outline=c, width=lw)
         d.arc((100,150,1100,1050), 205, 335, fill=c, width=lw)
         for a in ((1000,560,1120,520),(1000,620,1140,620),(1000,680,1120,720)): line([a[:2],a[2:]])
+    elif name == "feather":
+        import math
+        A, B, w = (250, 980), (950, 220), 190
+        dx, dy = B[0]-A[0], B[1]-A[1]; L = math.hypot(dx, dy); nx, ny = -dy/L, dx/L
+        top, bot = [], []
+        for i in range(0, 41):
+            t = i/40; k = w*math.sin(math.pi*t)**0.8
+            cx, cy = A[0]+dx*t, A[1]+dy*t
+            top.append((cx+nx*k, cy+ny*k)); bot.append((cx-nx*k, cy-ny*k))
+        line(top + bot[::-1] + [top[0]]); line([(A[0]-90, A[1]+90), B])
+        for t in (0.3, 0.45, 0.6, 0.75):
+            cx, cy = A[0]+dx*t, A[1]+dy*t; line([(cx, cy), (cx+nx*120+dx/L*70, cy+ny*120+dy/L*70)])
+    elif name == "shield":
+        line([(600,180),(980,320),(960,620),(800,860),(600,1010),(400,860),(240,620),(220,320),(600,180)])
+        line([(420,600),(550,730),(790,470)])
+    elif name == "scale":
+        line([(600,300),(600,960)]); line([(380,960),(820,960)]); line([(260,400),(940,400)])
+        d.ellipse((565,210,635,280), outline=c, width=lw)
+        for cx in (260, 940):
+            line([(cx,400),(cx-110,650)]); line([(cx,400),(cx+110,650)])
+            d.arc((cx-150,590,cx+150,780), 0, 180, fill=c, width=lw)
+    elif name == "none":
+        pass
     elif name == "camera":
         d.rounded_rectangle((160,380,1040,900), radius=70, outline=c, width=lw)
         d.rectangle((440,270,760,380), outline=c, width=lw)
@@ -68,7 +107,7 @@ def main(pid):
                            "-r", str(FPS), "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "17",
                            "-movflags", "+faststart", out], stdin=subprocess.PIPE)
     def text(layer, s, f, xy, a, center=True, fill=txt):
-        dr = ImageDraw.Draw(layer); w = dr.textlength(s, font=f)
+        dr = ImageDraw.Draw(layer); f = fit_font(f.path, f.size, s); w = dr.textlength(s, font=f)
         x = xy[0] - w / 2 if center else xy[0]
         dr.text((x, xy[1]), s, font=f, fill=fill + (int(255 * a),))
     for i in range(frames):
@@ -108,5 +147,28 @@ def main(pid):
     ff.stdin.close(); ff.wait(); print("Video:", out, f"({total:.1f}s)")
 
 
+def run_auto():
+    """Erzeugt fehlende Reel-Videos für Reels der nächsten Tage und trägt die video_url ein."""
+    from datetime import timedelta
+    rows = load_calendar(); changed = False
+    horizon = now() + timedelta(days=cfg().get("render_days_ahead", 14))
+    base = cfg()["media_base_url"].rstrip("/")
+    for r in rows:
+        pid = r["id"]
+        if r["format"] != "reel" or r["status"] not in ("draft", "approved") or parse_dt(r["publish_at"]) > horizon:
+            continue
+        if not os.path.exists(path("content", f"{pid}.motion.json")):
+            continue
+        try:
+            if not os.path.exists(path("media", pid, "reel.mp4")):
+                main(pid)
+            if not r["video_url"]:
+                r["video_url"] = f"{base}/media/{pid}/reel.mp4"; changed = True
+        except Exception as e:
+            print(f"::warning::Reel-Video {pid} fehlgeschlagen: {type(e).__name__}: {e}")
+    if changed:
+        save_calendar(rows)
+
+
 if __name__ == "__main__":
-    main(sys.argv[1])
+    run_auto() if sys.argv[1] == "--auto" else main(sys.argv[1])

@@ -69,6 +69,39 @@ Schema: {{"hook": str, "slides": [{{"title": str, "body": str}}] (6-9 Slides bei
         print(f"Nicht erstellt (beim nächsten Lauf erneut versucht): {', '.join(failed)}")
 
 
+ICONS = ["tent", "bag", "stove", "lamp", "camera", "feather", "shield", "scale", "none"]
+
+
+def motion():
+    """Lässt Claude für Reels eine Szenenfolge für das Motion-Graphic-Video entwerfen."""
+    rows = load_calendar()
+    horizon = now() + timedelta(days=cfg().get("render_days_ahead", 14))
+    for r in rows:
+        spec_path = path("content", f"{r['id']}.motion.json")
+        if r["format"] != "reel" or r["status"] not in ("draft", "approved") or os.path.exists(spec_path) \
+                or parse_dt(r["publish_at"]) > horizon:
+            continue
+        try:
+            c = load_content(r["id"])
+            prompt = f"""BRAND-PROFIL:\n{brand_profile()}\n\nERSTELLE DIE SZENENFOLGE FÜR EIN 20-SEKUNDEN-MOTION-GRAPHIC-REEL (nur Typografie und Linien-Icons, kein Footage).
+Thema: {r['topic']}
+Reel-Skript als Vorlage: {c.get('reel_script')}
+Schema: {{"hook": [zeile1, zeile2] (je max. 14 Zeichen), "scenes": [{{"no": "01", "title": str (max. 14 Zeichen), "sub": str (max. 34 Zeichen),
+"icon": einer von {ICONS}}}] (genau 4 bis 5 Szenen), "outro": [frage (max. 16 Zeichen), "Schreib es unten rein."]}}
+Keine erfundenen Fakten. Wähle das Icon, das am besten zur Szene passt."""
+            spec = ask(prompt, max_tokens=2000)
+            sc = spec.get("scenes")
+            if not (isinstance(spec.get("hook"), list) and len(spec["hook"]) == 2 and isinstance(sc, list)
+                    and 3 <= len(sc) <= 6 and all(x.get("icon") in ICONS and x.get("title") for x in sc)
+                    and isinstance(spec.get("outro"), list) and len(spec["outro"]) == 2):
+                raise ValueError("Szenenentwurf unvollständig")
+            with open(spec_path, "w", encoding="utf-8") as f:
+                json.dump(spec, f, ensure_ascii=False, indent=2)
+            print(f"Szenen erstellt: {r['id']}")
+        except Exception as e:
+            print(f"::warning::Szenen für {r['id']} fehlgeschlagen: {e}")
+
+
 def ideas():
     rows, profile = load_calendar(), brand_profile()
     offen = [r for r in rows if r["status"] in ("idea", "draft", "approved", "hold")]
@@ -97,4 +130,4 @@ Schema: [{{"pillar": str, "format": "carousel"|"image", "topic": str}}]"""
 
 
 if __name__ == "__main__":
-    {"drafts": drafts, "ideas": ideas}[sys.argv[1]]()
+    {"drafts": drafts, "ideas": ideas, "motion": motion}[sys.argv[1]]()
