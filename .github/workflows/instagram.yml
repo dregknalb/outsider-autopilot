@@ -12,13 +12,14 @@ concurrency: instagram
 jobs:
   run:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       IG_USER_ID: ${{ secrets.IG_USER_ID }}
       IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with: { python-version: "3.12" }
       - run: pip install -r requirements.txt && sudo apt-get install -y fonts-dejavu-core
       - name: Wöchentlich Ideen und Entwürfe
@@ -27,10 +28,15 @@ jobs:
         run: |
           python src/generate.py ideas
           python src/generate.py drafts
-          python src/render.py
       - name: Fehlende Slides rendern
         continue-on-error: true
         run: python src/render.py
+      - name: Reel-Videos erzeugen
+        continue-on-error: true
+        run: |
+          which ffmpeg || sudo apt-get install -y ffmpeg
+          python src/generate.py motion
+          python src/reel_motion.py --auto
       - name: Entwürfe committen
         run: |
           git config user.name "autopilot"; git config user.email "autopilot@users.noreply.github.com"
