@@ -1,0 +1,10 @@
+{
+  "hook": ["Ultraleicht", "oder langlebig?"],
+  "scenes": [
+    {"no": "01", "title": "Ultraleicht",  "sub": "Spart Gewicht, kostet Haltbarkeit", "icon": "feather"},
+    {"no": "02", "title": "Langlebig",    "sub": "Mehr Gewicht, mehr Jahre",          "icon": "shield"},
+    {"no": "03", "title": "Abwägen",      "sub": "Wie oft nutzt du es wirklich?",     "icon": "scale"},
+    {"no": "04", "title": "Dein Gear",    "sub": "Wo sparst du Gewicht?",             "icon": "tent"}
+  ],
+  "outro": ["Dein Kompromiss?", "Schreib es unten rein."]
+}
