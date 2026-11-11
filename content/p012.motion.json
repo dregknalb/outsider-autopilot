@@ -1,0 +1,42 @@
+{
+  "hook": [
+    "Camp aufbauen.",
+    "Ohne Eile."
+  ],
+  "scenes": [
+    {
+      "no": "01",
+      "title": "Ankommen",
+      "sub": "Leerer Platz. Rucksack ab.",
+      "icon": "bag"
+    },
+    {
+      "no": "02",
+      "title": "Zelt stellen",
+      "sub": "Stangen stecken. In Echtzeit.",
+      "icon": "tent"
+    },
+    {
+      "no": "03",
+      "title": "Halt",
+      "sub": "Heringe setzen. Nur Ton.",
+      "icon": "shield"
+    },
+    {
+      "no": "04",
+      "title": "Kocher",
+      "sub": "Jeder Handgriff sitzt.",
+      "icon": "stove"
+    },
+    {
+      "no": "05",
+      "title": "Licht an",
+      "sub": "Ein warmer, gedeckter Akzent.",
+      "icon": "lamp"
+    }
+  ],
+  "outro": [
+    "Dein Ritual?",
+    "Schreib es unten rein."
+  ]
+}
