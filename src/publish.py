@@ -57,7 +57,10 @@ def publish_row(r):
                    caption=cap, share_to_feed="true", **extra)["id"]
         wait_ready(cont)
     else:
-        files = sorted(os.listdir(path("media", r["id"])))
+        files = sorted(f for f in os.listdir(path("media", r["id"]))
+                       if f.lower().endswith((".png", ".jpg", ".jpeg")))   # nur Bilder, keine Markierungsdateien
+        if not files:
+            raise RuntimeError("Keine Bilder im Ordner media/" + r["id"])
         urls = [f"{base}/media/{r['id']}/{f}" for f in files]
         for u in urls:
             if not url_ready(u):
